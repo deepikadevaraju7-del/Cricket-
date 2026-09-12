@@ -18,3 +18,13 @@ bun run dev
 ```
 
 The app runs at http://localhost:8080.
+
+## Deploy to Vercel
+
+Import this repository into Vercel. The repository includes the Vercel build configuration.
+
+Add these environment variables in the Vercel project settings:
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`

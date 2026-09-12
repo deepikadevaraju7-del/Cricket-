@@ -23,6 +23,25 @@ function serverPublicClient() {
   );
 }
 
+function normalizeEmbeddings(value: unknown): number[][] {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((embedding) => {
+    if (Array.isArray(embedding)) {
+      return embedding.every((item) => typeof item === "number") ? [embedding] : [];
+    }
+
+    if (embedding && typeof embedding === "object" && "value" in embedding) {
+      const vector = (embedding as { value?: unknown }).value;
+      return Array.isArray(vector) && vector.every((item) => typeof item === "number")
+        ? [vector]
+        : [];
+    }
+
+    return [];
+  });
+}
+
 /** Public: player roster with the facial signatures used for matching. */
 export const getPlayers = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = serverPublicClient();
@@ -35,6 +54,6 @@ export const getPlayers = createServerFn({ method: "GET" }).handler(async () => 
 
   return (data ?? []).map((row) => ({
     ...row,
-    embeddings: Array.isArray(row.embeddings) ? (row.embeddings as unknown as number[][]) : [],
+    embeddings: normalizeEmbeddings(row.embeddings),
   })) as PlayerRecord[];
 });

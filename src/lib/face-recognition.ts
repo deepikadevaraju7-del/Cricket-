@@ -28,7 +28,7 @@ export async function loadFaceEngine(): Promise<FaceApi> {
       // face-api bundles its own TFJS build; initialise that one (no second copy).
       await (faceapi.tf as unknown as { ready: () => Promise<void> }).ready();
       await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+        faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
         faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
         faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
       ]);
@@ -68,7 +68,10 @@ export async function describeFace(imageUrl: string): Promise<DetectionResult | 
   const image = await faceapi.fetchImage(imageUrl);
 
   const results = await faceapi
-    .detectAllFaces(image, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.3 }))
+    .detectAllFaces(
+      image,
+      new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.3 }),
+    )
     .withFaceLandmarks()
     .withFaceDescriptors();
 
